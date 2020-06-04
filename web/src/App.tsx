@@ -1,23 +1,14 @@
-import React, {useState} from 'react';
+import React from 'react';
 import './App.css';
-import Header from './Header'
+import Home from './pages/Home'
+import CreatePoint from './pages/CreatePoint'
 
 // JSX: Sintaxe de XML dentro do JavaScript
+// UseState = array => [value, function to update the value]
 
-function App() {
-  const [counter, setCounter] = useState(0)  // Retorna um array => [value, function to update]
-
-  function handleButtonClick(){
-    setCounter(counter + 1)
-  }
-  
+function App() { 
   return (
-    <div>
-      <Header title="Hello World"/>
-
-      <h2>{counter}</h2>
-      <button type="button" onClick={handleButtonClick}>Aumentar</button>
-    </div>
+    <Home />
   );
 }
 
