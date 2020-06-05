@@ -6,7 +6,7 @@ import Constants from 'expo-constants'
 
 import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native'
 import { Feather as Icon } from '@expo/vector-icons'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
 import {SvgUri} from 'react-native-svg'
 
 interface Item{
@@ -21,6 +21,10 @@ interface Point{
   latitude: number,
   longitude: number
 }
+interface RouteParams{
+  uf: string,
+  city: string
+}
 
 const Points = () => {
     const [items, setItems] = useState<Item[]>([])
@@ -29,6 +33,9 @@ const Points = () => {
     const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
     
     const navigation = useNavigation()
+    const route = useRoute()
+
+    const routeParams = route.params as RouteParams
 
     useEffect(() => {
       api.get('items').then(response => {
@@ -76,15 +83,15 @@ const Points = () => {
     useEffect(() => {
       api.get('points', {
         params: {
-          city: "Diamante D'Oeste",
-          uf: 'PR',
-          items: [1, 3]
+          city: routeParams.city,
+          uf: routeParams.uf,
+          items: selectedItems
         }
       }).then(response => {
         
         setPoints(response.data)
       })
-    }, [])
+    }, [selectedItems])
 
     function handleNavigationBack(){
         navigation.goBack()
