@@ -81,7 +81,7 @@ const Points = () => {
           items: [1, 3]
         }
       }).then(response => {
-        console.log(response.data)
+        
         setPoints(response.data)
       })
     }, [])
