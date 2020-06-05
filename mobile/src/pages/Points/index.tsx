@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react'
 import MapView, { Marker } from 'react-native-maps'
 import api from '../../services/api'
+import * as Location from 'expo-location'
+import Constants from 'expo-constants'
 
-import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
+import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView, Alert } from 'react-native'
 import { Feather as Icon } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import {SvgUri} from 'react-native-svg'
@@ -12,10 +14,20 @@ interface Item{
   title: string,
   image_url: string
 }
+interface Point{
+  id: number,
+  name: string,
+  image: string,
+  latitude: number,
+  longitude: number
+}
 
 const Points = () => {
     const [items, setItems] = useState<Item[]>([])
+    const [points, setPoints] = useState<Point[]>([])
     const [selectedItems, setSelectedItems] = useState<number[]>([])
+    const [initialPosition, setInitialPosition] = useState<[number, number]>([0, 0])
+    
     const navigation = useNavigation()
 
     useEffect(() => {
@@ -25,7 +37,6 @@ const Points = () => {
         response.data.map((data: Item) => {
           
           const rotaURL = data.image_url.split(':')
-          console.log(rotaURL)
           const image_url = 'http://10.0.2.2:' + rotaURL[2]
         
           const formatedData: Item = {
@@ -41,11 +52,45 @@ const Points = () => {
       })
     }, [])
 
+    useEffect(() => {
+      
+      async function loadPosition(){
+        const { status } = await Location.requestPermissionsAsync()
+
+        if (status !== 'granted'){
+          Alert.alert('Ooops...', 'Precisamos da sua permissão para obter a localização.')
+
+          return
+        }
+
+        const location = await Location.getCurrentPositionAsync()
+        const { latitude, longitude } = location.coords
+
+        console.log(latitude, longitude)
+
+        setInitialPosition([latitude, longitude])
+      }
+      loadPosition()
+    }, [])
+
+    useEffect(() => {
+      api.get('points', {
+        params: {
+          city: "Diamante D'Oeste",
+          uf: 'PR',
+          items: [1, 3]
+        }
+      }).then(response => {
+        console.log(response.data)
+        setPoints(response.data)
+      })
+    }, [])
+
     function handleNavigationBack(){
         navigation.goBack()
     }
-    function handleNavigateToDetail(){
-        navigation.navigate('Detail')
+    function handleNavigateToDetail(id: number){
+        navigation.navigate('Detail', { point_id: id })
     }
     function handleSelectItem(id: number){
         const alreadySelected = selectedItems.findIndex(item => item === id)
@@ -70,14 +115,18 @@ const Points = () => {
                 <Text style={styles.description}>Encontre no mapa um ponto de coleta</Text>
 
                 <View style={styles.mapContainer}>
-                    <MapView style={styles.map} initialRegion={{latitude: -24.9447126, longitude: -54.10459, latitudeDelta: 0.009, longitudeDelta: 0.009}}>
-                        <Marker coordinate={{latitude: -24.9447126, longitude: -54.10459}} style={styles.mapMarker} onPress={handleNavigateToDetail}>
-                            <View style={styles.mapMarkerContainer}>
-                                <Image style={styles.mapMarkerImage} source={{uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'}}/>
-                                <Text style={styles.mapMarkerTitle}>Mercado do Seu Zé</Text>
-                            </View>
-                        </Marker>
-                    </MapView>
+                   { initialPosition[0] !== 0 && (
+                     <MapView style={styles.map} initialRegion={{latitude:initialPosition[0], longitude:initialPosition[1], latitudeDelta: 0.009, longitudeDelta: 0.009}} >
+                     {points.map(point => (
+                       <Marker coordinate={{latitude: point.latitude, longitude: point.longitude}} style={styles.mapMarker} onPress={() => handleNavigateToDetail(point.id)} key={String(point.id)}>
+                       <View style={styles.mapMarkerContainer}>
+                           <Image style={styles.mapMarkerImage} source={{uri: point.image}}/>
+                           <Text style={styles.mapMarkerTitle}>{point.name}</Text>
+                       </View>
+                   </Marker>
+                     ))}
+                 </MapView>
+                   )} 
                 </View>
             </View>
             <View style={styles.itemsContainer}>
@@ -98,7 +147,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       paddingHorizontal: 32,
-      paddingTop: 20,
+      paddingTop: 20 + Constants.statusBarHeight,
     },
   
     title: {

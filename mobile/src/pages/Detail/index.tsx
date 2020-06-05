@@ -1,17 +1,50 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import Constants from 'expo-constants'
+import api from '../../services/api'
 
 import { RectButton } from 'react-native-gesture-handler'
 import { Feather as Icon, FontAwesome } from '@expo/vector-icons'
 import { Text, View, StyleSheet, TouchableOpacity, Image, SafeAreaView } from 'react-native'
-import { useNavigation } from '@react-navigation/native'
+import { useNavigation, useRoute } from '@react-navigation/native'
+
+interface RouteParams{
+  point_id: number
+}
+interface Data{
+  point: {
+    image: string,
+    name: string,
+    email: string,
+    whatsapp: string,
+    city: string,
+    uf: string
+  }
+  items: {
+    title: string
+  }[]
+}
 
 const Detail = () => {
+    const [data, setData] = useState<Data>({} as Data)
+
     const navigation = useNavigation()
+    const route = useRoute()
+
+    const routeParams = route.params as RouteParams
+
+    useEffect(() => {
+      api.get(`points/${routeParams.point_id}`).then(response => {
+        setData(response.data)
+      })
+    }, [])
 
     function handleNavigationBack(){
         navigation.goBack()
     }
+    if(!data.point)
+      return null
 
+    console.log(data)
     return (
         <SafeAreaView style={{flex: 1}}>
             <View style={styles.container}>
@@ -19,14 +52,14 @@ const Detail = () => {
                     <Icon name="arrow-left" color="#34cb79" size={29}/>
                 </TouchableOpacity>
 
-                <Image style={styles.pointImage} source={{uri: 'https://images.unsplash.com/photo-1542838132-92c53300491e?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=400&q=60'}}/>
+                <Image style={styles.pointImage} source={{uri:data.point.image }}/>
 
-                <Text style={styles.pointName}>Mercado do Seu Zé</Text>
-                <Text style={styles.pointItems}>Lâmpadas, Óleo de cozinha, etc</Text>
+                <Text style={styles.pointName}>{data.point.name}</Text>
+                <Text style={styles.pointItems}>{data.items.map(item => item.title).join(', ')}</Text>
 
                 <View style={styles.address}>
                     <Text style={styles.addressTitle}>Endereço</Text>
-                    <Text style={styles.addressContent}>Diamante D'Oeste, PR</Text>
+                    <Text style={styles.addressContent}>{data.point.city}, {data.point.uf}</Text>
                 </View>
             </View>
             <View style={styles.footer}>
@@ -48,7 +81,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       padding: 32,
-      paddingTop: 20,
+      paddingTop: 20 + Constants.statusBarHeight,
     },
   
     pointImage: {
