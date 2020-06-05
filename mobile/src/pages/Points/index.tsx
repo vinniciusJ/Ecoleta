@@ -2,7 +2,6 @@ import React from 'react'
 import { Text, View, Image, StyleSheet, TouchableOpacity, ScrollView } from 'react-native'
 import { Feather as Icon } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
-import Constants from 'expo-constants'
 import MapView, { Marker } from 'react-native-maps'
 import {SvgUri} from 'react-native-svg'
 
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
     container: {
       flex: 1,
       paddingHorizontal: 32,
-      paddingTop: 20 + Constants.statusBarHeight,
+      paddingTop: 20,
     },
   
     title: {
