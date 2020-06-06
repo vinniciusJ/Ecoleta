@@ -197,7 +197,10 @@ Segue o link para o arquivo compactado (`.zip`) com as fotos do projeto:
 
 * [Vinicius de Oliveira Jimenez][linkedin_url]
 
-[capa_url]: .assets/Ecoleta.png "Capa NLW"
-[logo_url]: .assets/logo.svg "Logo Ecoleta"
+[capa_url]: assets/Ecoleta.png "Capa NLW"
+[logo_url]: assets/logo.svg "Logo Ecoleta"
+
+[node_url]: https://nodejs.org/en/download/ "Instalar Node"
+[expo_url]: https://docs.expo.io/workflow/expo-cli/ "Instalar Expo CLI"
 [linkedin_url]: https://www.linkedin.com/in/vinicius-jimenez-91a0951a6 "LinkedIn"
 [fotos_url]: https://drive.google.com/file/d/1fmQqpimjTRXhpAsQ9H4Rg7zyEJKiV__-/view "Clique aqui para baixar"
