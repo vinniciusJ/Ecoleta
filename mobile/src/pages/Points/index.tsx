@@ -90,7 +90,19 @@ const Points = () => {
         }
       }).then(response => {
         
-        setPoints(response.data)
+        const datas: Point[] = []
+        
+        response.data.map((data: Point) => {
+          
+          const rotaURL = data.image_url.split(':')
+          const image_url = 'http://10.0.2.2:' + rotaURL[2]
+        
+          const formatedData: Point = {...data, image_url}
+
+          datas.push(formatedData)
+        })
+
+        setPoints(datas)
       })
     }, [selectedItems])
 
