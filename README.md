@@ -193,7 +193,7 @@ Segue o link para o arquivo compactado (`.zip`) com as fotos do projeto:
 
 ---
 
-### Sobre o autor:
+### Sobre o autor
 
 * [Vinicius de Oliveira Jimenez][linkedin_url]
 
