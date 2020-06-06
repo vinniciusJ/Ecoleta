@@ -98,7 +98,7 @@ const Points = () => {
           const image_url = 'http://10.0.2.2:' + rotaURL[2]
         
           const formatedData: Point = {...data, image_url}
-
+          console.log(formatedData)
           datas.push(formatedData)
         })
 
